@@ -10,7 +10,7 @@ import { CreateUserDto } from './dto/createUserDto';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('users')
+@Controller('user')
 export class UserController {
   constructor(private readonly usersService: UserService) {}
 

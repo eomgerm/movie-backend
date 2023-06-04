@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import { DataSource } from 'typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { MovieModule } from './movie/movie.module';
@@ -24,6 +23,7 @@ import { MovieModule } from './movie/movie.module';
       database: process.env.DB_DATABASE,
       logging: true,
       entities: [join(__dirname, '../dist/entities/*{.ts,.js}')],
+      synchronize: true,
     }),
     UserModule,
     AuthModule,

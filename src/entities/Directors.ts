@@ -1,22 +1,22 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { MovieDirectors } from "./MovieDirectors";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { MovieDirectors } from './MovieDirectors';
 
-@Entity("directors", { schema: "movie" })
+@Entity('directors', { schema: 'movie' })
 export class Directors {
   @PrimaryGeneratedColumn({
-    type: "bigint",
-    name: "id",
-    comment: "감독 아이디",
+    type: 'bigint',
+    name: 'diretor_id',
+    comment: '감독 아이디',
   })
-  id: string;
+  directorId: string;
 
-  @Column("varchar", { name: "name", comment: "감독 이름", length: 20 })
+  @Column('varchar', { name: 'name', comment: '감독 이름', length: 20 })
   name: string;
 
-  @Column("varchar", {
-    name: "profile_image",
+  @Column('varchar', {
+    name: 'profile_image',
     nullable: true,
-    comment: "사진",
+    comment: '사진',
     length: 300,
   })
   profileImage: string | null;

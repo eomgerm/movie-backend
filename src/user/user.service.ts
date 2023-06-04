@@ -4,17 +4,12 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(Users) private userRepository: Repository<Users>,
-    private dataSource: DataSource,
-  ) {}
-
+  constructor(private dataSource: DataSource) {}
   async createUser(userData: CreateUserDto) {
     const queryRunner = this.dataSource.createQueryRunner();
 
@@ -32,13 +27,15 @@ export class UserService {
       return insertResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException('DB ERROR');
+      throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
     } finally {
       await queryRunner.release();
     }
   }
 
   async findbyEmail(email: string) {
-    return await this.userRepository.findOneBy({ email: email });
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    return await queryRunner.manager.findOneBy(Users, { email: email });
   }
 }
