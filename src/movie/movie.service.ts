@@ -108,7 +108,7 @@ export class MovieService {
     }
   }
 
-  async findMovieById(movieId: string) {
+  async findOneById(movieId: string) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
@@ -185,6 +185,93 @@ export class MovieService {
         posters,
         trailers,
       };
+    } catch (error) {
+      throw new InternalServerErrorException(`DB ERROR, ${error.message}`);
+    } finally {
+      queryRunner.release();
+    }
+  }
+
+  async findAll() {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      queryRunner.connect();
+      queryRunner.startTransaction();
+
+      const moviesData = await queryRunner.manager.find(Movies);
+
+      if (!moviesData) {
+        return new NotFoundException(`Movies not found`);
+      }
+
+      let movies = [];
+      for (const movieData of moviesData) {
+        const {
+          movieId: id,
+          title,
+          openDate,
+          watchGrade,
+          wkBookingRates,
+          summary,
+          totalRating,
+          runningTime,
+          status,
+        } = movieData;
+
+        const directorsRaw = await queryRunner.manager.find(MovieDirectors, {
+          relations: { director: true },
+          where: { movieId: id },
+        });
+        const directors = directorsRaw.map(({ director }) => ({
+          name: director.name,
+          profileImage: director.profileImage,
+        }));
+
+        const actorsRaw = await queryRunner.manager.find(MovieActors, {
+          relations: { actor: true },
+          where: { movieId: id },
+        });
+        const actors = actorsRaw.map((actorRaw) => ({
+          role: actorRaw.role,
+          name: actorRaw.actor.name,
+          profileImage: actorRaw.actor.profileImage,
+        }));
+
+        const postersRaw = await queryRunner.manager.find(Posters, {
+          where: { movieId: id },
+        });
+        const posters = postersRaw.map(({ path }) => path);
+
+        const trailersRaw = await queryRunner.manager.find(Trailers, {
+          where: { movieId: id },
+        });
+        const trailers = trailersRaw.map(({ path }) => path);
+
+        const genresRaw = await queryRunner.manager.find(MovieGenres, {
+          where: { movieId: id },
+          relations: { genre: true },
+        });
+        const genres = genresRaw.map(({ genre }) => genre.genre);
+
+        movies.push({
+          id,
+          title,
+          openDate,
+          watchGrade,
+          wkBookingRates,
+          summary,
+          totalRating,
+          runningTime,
+          status,
+          genres,
+          actors,
+          posters,
+          trailers,
+        });
+      }
+
+      return movies;
     } catch (error) {
       throw new InternalServerErrorException(`DB ERROR, ${error.message}`);
     } finally {
