@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { MovieModule } from './movie/movie.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MovieModule } from './movie/movie.module';
     UserModule,
     AuthModule,
     MovieModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
