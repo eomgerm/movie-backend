@@ -4,7 +4,6 @@ import {
   Post,
   UseGuards,
   Request,
-  UnauthorizedException,
   Body,
 } from '@nestjs/common';
 import { BookingService } from './booking.service';
@@ -26,8 +25,10 @@ export class BookingController {
       user: { sub: userId },
     } = req;
 
-    const { seats: seatsRow } = bookingData;
-    const seats = seatsRow.join(',');
-    return this.bookingService.createBooking(scheduleId, userId, seats);
+    return this.bookingService.createBooking(
+      scheduleId,
+      userId,
+      bookingData.seats,
+    );
   }
 }

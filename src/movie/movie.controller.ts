@@ -22,9 +22,7 @@ export class MovieController {
       throw new BadRequestException('No Content Requested');
     }
 
-    const result = this.movieService.createMovie(movieData);
-
-    return result;
+    return this.movieService.createMovie(movieData);
   }
 
   @Get('/:id')
