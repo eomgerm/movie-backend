@@ -1,17 +1,24 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
-import { ScreenSchedule } from './ScreenSchedule';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Users } from './Users';
+import { ScreenSchedule } from './ScreenSchedule';
 
+@Index('IX_bookings_1', ['userId'], {})
 @Index(
   'FK_bookings_schedule_id_screen_schedule_schedule_id',
   ['scheduleId'],
   {},
 )
-@Index('IX_bookings_1', ['userId'], {})
 @Entity('bookings', { schema: 'movie' })
 export class Bookings {
-  @Column('bigint', {
-    primary: true,
+  @PrimaryGeneratedColumn({
+    type: 'bigint',
     name: 'booking_id',
     comment: '예약 아이디',
   })
@@ -36,6 +43,13 @@ export class Bookings {
   @Column('varchar', { name: 'seats', comment: '예약한 자리', length: 30 })
   seats: string;
 
+  @ManyToOne(() => Users, (users) => users.bookings, {
+    onDelete: 'CASCADE',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn([{ name: 'user_id', referencedColumnName: 'userId' }])
+  user: Users;
+
   @ManyToOne(
     () => ScreenSchedule,
     (screenSchedule) => screenSchedule.bookings,
@@ -43,11 +57,4 @@ export class Bookings {
   )
   @JoinColumn([{ name: 'schedule_id', referencedColumnName: 'scheduleId' }])
   schedule: ScreenSchedule;
-
-  @ManyToOne(() => Users, (users) => users.bookings, {
-    onDelete: 'CASCADE',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn([{ name: 'user_id', referencedColumnName: 'userId' }])
-  user: Users;
 }

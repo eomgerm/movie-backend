@@ -72,10 +72,7 @@ export class Movies {
   })
   updatedAt: Date | null;
 
-  @Column('int', {
-    name: 'running_time',
-    comment: '상영 시간',
-  })
+  @Column('int', { name: 'running_time', comment: '상영 시간' })
   runningTime: number;
 
   @OneToMany(() => MovieActors, (movieActors) => movieActors.movie)

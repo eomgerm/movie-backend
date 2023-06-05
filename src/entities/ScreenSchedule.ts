@@ -8,12 +8,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Bookings } from './Bookings';
-import { Movies } from './Movies';
 import { Theaters } from './Theaters';
+import { Movies } from './Movies';
 
-@Index('FK_screen_schedule_movie_id_movies_movie_id', ['movieId'], {})
-@Index('FK_screen_schedule_theater_id_theaters_theater_id', ['theaterId'], {})
 @Index('IX_screen_schedule_1', ['start', 'movieId', 'theaterId'], {})
+@Index('FK_screen_schedule_theater_id_theaters_theater_id', ['theaterId'], {})
+@Index('FK_screen_schedule_movie_id_movies_movie_id', ['movieId'], {})
 @Entity('screen_schedule', { schema: 'movie' })
 export class ScreenSchedule {
   @PrimaryGeneratedColumn({
@@ -38,17 +38,17 @@ export class ScreenSchedule {
   @OneToMany(() => Bookings, (bookings) => bookings.schedule)
   bookings: Bookings[];
 
-  @ManyToOne(() => Movies, (movies) => movies.screenSchedules, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn([{ name: 'movie_id', referencedColumnName: 'movieId' }])
-  movie: Movies;
-
   @ManyToOne(() => Theaters, (theaters) => theaters.screenSchedules, {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
   @JoinColumn([{ name: 'theater_id', referencedColumnName: 'theaterId' }])
   theater: Theaters;
+
+  @ManyToOne(() => Movies, (movies) => movies.screenSchedules, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn([{ name: 'movie_id', referencedColumnName: 'movieId' }])
+  movie: Movies;
 }

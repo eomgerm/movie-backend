@@ -6,11 +6,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Directors } from './Directors';
 import { Movies } from './Movies';
+import { Directors } from './Directors';
 
-@Index('FK_movie_directors_director_id_directors_id', ['directorId'], {})
 @Index('FK_movie_directors_movie_id_movies_movie_id', ['movieId'], {})
+@Index('FK_movie_directors_director_id_directors_id', ['directorId'], {})
 @Entity('movie_directors', { schema: 'movie' })
 export class MovieDirectors {
   @PrimaryGeneratedColumn({ type: 'bigint', name: 'id', comment: 'PK' })
@@ -22,17 +22,17 @@ export class MovieDirectors {
   @Column('bigint', { name: 'movie_id', comment: '감독한 영화' })
   movieId: string;
 
-  @ManyToOne(() => Directors, (directors) => directors.movieDirectors, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'RESTRICT',
-  })
-  @JoinColumn([{ name: 'director_id', referencedColumnName: 'directorId' }])
-  director: Directors;
-
   @ManyToOne(() => Movies, (movies) => movies.movieDirectors, {
     onDelete: 'RESTRICT',
     onUpdate: 'RESTRICT',
   })
   @JoinColumn([{ name: 'movie_id', referencedColumnName: 'movieId' }])
   movie: Movies;
+
+  @ManyToOne(() => Directors, (directors) => directors.movieDirectors, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'RESTRICT',
+  })
+  @JoinColumn([{ name: 'director_id', referencedColumnName: 'directorId' }])
+  director: Directors;
 }

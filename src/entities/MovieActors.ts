@@ -9,8 +9,8 @@ import {
 import { Actors } from './Actors';
 import { Movies } from './Movies';
 
-@Index('FK_movie_actors_movie_id_movies_movie_id', ['movieId'], {})
 @Index('IX_movie_actors_1', ['actorId', 'movieId'], {})
+@Index('FK_movie_actors_movie_id_movies_movie_id', ['movieId'], {})
 @Entity('movie_actors', { schema: 'movie' })
 export class MovieActors {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: 'PK' })
@@ -28,7 +28,7 @@ export class MovieActors {
     comment: '역할',
     length: 10,
   })
-  role: string;
+  role: string | null;
 
   @ManyToOne(() => Actors, (actors) => actors.movieActors, {
     onDelete: 'RESTRICT',

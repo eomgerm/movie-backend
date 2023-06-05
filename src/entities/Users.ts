@@ -8,15 +8,10 @@ import {
 import { Bookings } from './Bookings';
 import { ReviewHelpful } from './ReviewHelpful';
 import { Reviews } from './Reviews';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Index('IX_users_1', ['email', 'name', 'username'], {})
 @Entity('users', { schema: 'movie' })
 export class Users {
-  @ApiProperty({
-    example: 1,
-    description: '사용자 아이디',
-  })
   @PrimaryGeneratedColumn({
     type: 'bigint',
     name: 'user_id',

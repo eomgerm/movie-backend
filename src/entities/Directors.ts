@@ -5,7 +5,7 @@ import { MovieDirectors } from './MovieDirectors';
 export class Directors {
   @PrimaryGeneratedColumn({
     type: 'bigint',
-    name: 'diretor_id',
+    name: 'director_id',
     comment: '감독 아이디',
   })
   directorId: string;
