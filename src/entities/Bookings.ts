@@ -40,9 +40,6 @@ export class Bookings {
   @Column('int', { name: 'status', comment: '상태' })
   status: number;
 
-  @Column('varchar', { name: 'seats', comment: '예약한 자리', length: 30 })
-  seats: string;
-
   @ManyToOne(() => Users, (users) => users.bookings, {
     onDelete: 'CASCADE',
     onUpdate: 'RESTRICT',
