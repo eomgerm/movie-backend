@@ -21,7 +21,7 @@ export class BookingSeats {
   seat: string;
 
   @ManyToOne(() => Bookings, (bookings) => bookings.bookingId, {
-    onDelete: 'RESTRICT',
+    onDelete: 'CASCADE',
     onUpdate: 'RESTRICT',
   })
   @JoinColumn([{ name: 'booking_id', referencedColumnName: 'bookingId' }])
