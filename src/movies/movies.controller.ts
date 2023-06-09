@@ -2,20 +2,25 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   ParseArrayPipe,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto/createMovieDto';
 import { MoviesService } from './movies.service';
 import { ReviewsService } from 'src/reviews/reviews.service';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { CreateReviewDto } from 'src/reviews/createReviewDto';
 
 @Controller('movies')
 export class MoviesController {
   constructor(
     private readonly movieService: MoviesService,
-    private readonly reviesService: ReviewsService,
+    private readonly reviewsService: ReviewsService,
   ) {}
   @Post()
   createMovies(
@@ -29,9 +34,9 @@ export class MoviesController {
     return this.movieService.createMovie(movieData);
   }
 
-  @Get('/:id')
-  getMovieById(@Param('id') id: string) {
-    return this.movieService.findOneById(id);
+  @Get('/:movieId')
+  getMovieById(@Param('movieId') movieId: string) {
+    return this.movieService.findOneById(movieId);
   }
 
   @Get()
@@ -39,6 +44,34 @@ export class MoviesController {
     return this.movieService.findAll();
   }
 
-  @Get('/:id/reviews')
-  getAllReviws() {}
+  @Get('/:movieId/reviews')
+  async getAllReviws(@Param('movieId') movieId: string) {
+    console.log(movieId);
+    return await this.reviewsService.findAllReviews(movieId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/:movieId/reviews')
+  async createReview(
+    @Param('movieId') movieId: string,
+    @Req() req,
+    @Body() reviewData: CreateReviewDto,
+  ) {
+    const {
+      user: { sub: userId },
+    } = req;
+
+    const checkBookings = await this.reviewsService.checkBookings(
+      movieId,
+      userId,
+    );
+
+    if (!checkBookings) {
+      throw new ForbiddenException(
+        'Only users booked this movie can write reviews',
+      );
+    }
+
+    return await this.reviewsService.createReview(reviewData, movieId, userId);
+  }
 }
