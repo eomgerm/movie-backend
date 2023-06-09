@@ -26,12 +26,15 @@ export class MovieController {
   }
 
   @Get('/:id')
-  findOne(@Param('id') id: string) {
+  getMovieById(@Param('id') id: string) {
     return this.movieService.findOneById(id);
   }
 
   @Get()
-  findAll() {
+  getAllMovies() {
     return this.movieService.findAll();
   }
+
+  @Get('/:id/reviews')
+  getAllreviws() {}
 }
