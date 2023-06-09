@@ -7,12 +7,12 @@ import {
   Request,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
-import { UserService } from './user.service';
+import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly usersService: UserService) {}
+@Controller('users')
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   postUser(@Body() userData: CreateUserDto) {

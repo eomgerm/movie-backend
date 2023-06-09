@@ -3,11 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user/user.module';
+import { UsersModule } from './users/users.module';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
-import { MovieModule } from './movie/movie.module';
-import { BookingModule } from './booking/booking.module';
+import { MoviesModule } from './movies/movies.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { ReviewsService } from './reviews/reviews.service';
 
 @Module({
   imports: [
@@ -26,12 +27,12 @@ import { BookingModule } from './booking/booking.module';
       entities: [join(__dirname, '../dist/entities/*{.ts,.js}')],
       synchronize: true,
     }),
-    UserModule,
+    UsersModule,
     AuthModule,
-    MovieModule,
-    BookingModule,
+    MoviesModule,
+    BookingsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ReviewsService],
 })
 export class AppModule {}

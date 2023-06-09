@@ -8,11 +8,15 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateMovieDto } from './dto/createMovieDto';
-import { MovieService } from './movie.service';
+import { MoviesService } from './movies.service';
+import { ReviewsService } from 'src/reviews/reviews.service';
 
-@Controller('movie')
-export class MovieController {
-  constructor(private readonly movieService: MovieService) {}
+@Controller('movies')
+export class MoviesController {
+  constructor(
+    private readonly movieService: MoviesService,
+    private readonly reviesService: ReviewsService,
+  ) {}
   @Post()
   createMovies(
     @Body(new ParseArrayPipe({ items: CreateMovieDto }))
@@ -36,5 +40,5 @@ export class MovieController {
   }
 
   @Get('/:id/reviews')
-  getAllreviws() {}
+  getAllReviws() {}
 }

@@ -8,7 +8,7 @@ import { Bookings } from 'src/entities/Bookings';
 import { DataSource, In } from 'typeorm';
 
 @Injectable()
-export class BookingService {
+export class BookingsService {
   constructor(private dataSource: DataSource) {}
 
   async createBooking(scheduleId: string, userId: string, seats: string[]) {

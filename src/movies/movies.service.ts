@@ -16,7 +16,7 @@ import { Genres } from 'src/entities/Genres';
 import { MovieGenres } from 'src/entities/MovieGenres';
 
 @Injectable()
-export class MovieService {
+export class MoviesService {
   constructor(private dataSource: DataSource) {}
   async createMovie(movieData: CreateMovieDto[]) {
     const queryRunner = this.dataSource.createQueryRunner();

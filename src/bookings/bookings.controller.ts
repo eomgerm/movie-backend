@@ -9,13 +9,13 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { BookingService } from './booking.service';
+import { BookingsService } from './bookings.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { BookingDto } from './dto/bookingDto';
 
-@Controller('booking')
-export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+@Controller('bookings')
+export class BookingsController {
+  constructor(private readonly bookingService: BookingsService) {}
 
   @UseGuards(AuthGuard)
   @Post(':scheduleId')

@@ -8,7 +8,7 @@ import { Users } from 'src/entities/Users';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(private dataSource: DataSource) {}
   async createUser(userData: CreateUserDto) {
     const queryRunner = this.dataSource.createQueryRunner();
