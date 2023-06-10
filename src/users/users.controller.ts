@@ -14,6 +14,7 @@ import { CreateUserDto } from './dto/createUserDto';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ReviewsService } from 'src/reviews/reviews.service';
+import { CreateHelpfulReviewDto } from './dto/createHelpfulReviewDto';
 
 @Controller('users')
 export class UsersController {
@@ -56,5 +57,26 @@ export class UsersController {
     }
 
     return await this.reviewsService.deleteReview(reviewId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/helpful_reviews')
+  async postHelpfulReview(
+    @Request() req,
+    @Body() helpfulReview: CreateHelpfulReviewDto,
+  ) {
+    const {
+      user: { sub: userId },
+    } = req;
+
+    const { reviewId } = helpfulReview;
+
+    const isExists = await this.reviewsService.checkReview(reviewId);
+
+    if (!isExists) {
+      throw new NotFoundException('Review not found');
+    }
+
+    return await this.usersService.createHelpfulReview(userId, reviewId);
   }
 }

@@ -7,6 +7,7 @@ import { CreateUserDto } from './dto/createUserDto';
 import { Users } from 'src/entities/Users';
 import { DataSource, RelationId } from 'typeorm';
 import { Reviews } from 'src/entities/Reviews';
+import { ReviewHelpful } from 'src/entities/ReviewHelpful';
 
 @Injectable()
 export class UsersService {
@@ -23,8 +24,8 @@ export class UsersService {
         throw new ForbiddenException('Email already exists');
       }
       const insertResult = await queryRunner.manager.insert(Users, userData);
-      await queryRunner.commitTransaction();
 
+      await queryRunner.commitTransaction();
       return insertResult;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -40,30 +41,24 @@ export class UsersService {
     return await queryRunner.manager.findOneBy(Users, { email: email });
   }
 
-  async checkReviewOwner(userId: string, reviewId: string) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    const isOwner = await queryRunner.manager.exists(Reviews, {
-      where: { author: userId, reviewId },
-    });
-    await queryRunner.release();
-
-    return isOwner;
-  }
-
-  async deleteReview(reviewId: string) {
+  async createHelpfulReview(userId: string, reviewId: string) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      await queryRunner.manager.delete(Reviews, reviewId);
+      const { identifiers } = await queryRunner.manager.insert(ReviewHelpful, {
+        userId,
+        reviewId,
+      });
 
       await queryRunner.commitTransaction();
+
+      return identifiers[0].id;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException('DB ERROR: ' + error.message);
+      throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
     } finally {
       await queryRunner.release();
     }
