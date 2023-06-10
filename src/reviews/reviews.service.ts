@@ -81,4 +81,55 @@ export class ReviewsService {
       await queryRunner.release();
     }
   }
+
+  async checkReview(reviewId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      const isExists = await queryRunner.manager.exists(Reviews, {
+        where: { reviewId },
+      });
+
+      return isExists;
+    } catch (error) {
+      throw new InternalServerErrorException('DB ERROR: ' + error.message);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async checkReviewOwner(userId: string, reviewId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
+      const isOwner = await queryRunner.manager.exists(Reviews, {
+        where: { author: userId, reviewId },
+      });
+
+      return isOwner;
+    } catch (error) {
+      throw new InternalServerErrorException('DB ERROR: ' + error.message);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteReview(reviewId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      await queryRunner.manager.delete(Reviews, reviewId);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException('DB ERROR: ' + error.message);
+    } finally {
+      await queryRunner.release();
+    }
+  }
 }

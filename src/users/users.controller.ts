@@ -8,14 +8,19 @@ import {
   Param,
   Delete,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { ReviewsService } from 'src/reviews/reviews.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly reviewsService: ReviewsService,
+  ) {}
 
   @Post()
   postUser(@Body() userData: CreateUserDto) {
@@ -35,12 +40,21 @@ export class UsersController {
       user: { sub: userId },
     } = req;
 
-    const isOwner = await this.usersService.checkReviewOwner(userId, reviewId);
+    const isExists = await this.reviewsService.checkReview(reviewId);
+
+    if (!isExists) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const isOwner = await this.reviewsService.checkReviewOwner(
+      userId,
+      reviewId,
+    );
 
     if (!isOwner) {
       throw new ForbiddenException('You are not owner of this review');
     }
 
-    return await this.usersService.deleteReview(reviewId);
+    return await this.reviewsService.deleteReview(reviewId);
   }
 }
