@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { Users } from 'src/entities/Users';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, RelationId } from 'typeorm';
 import { Reviews } from 'src/entities/Reviews';
 
 @Injectable()
@@ -40,19 +40,32 @@ export class UsersService {
     return await queryRunner.manager.findOneBy(Users, { email: email });
   }
 
-  async checkReviewOwner(
-    userId: string,
-    reviewId: string,
-    dbManager: EntityManager,
-  ) {
-    const isOwner = await dbManager.exists(Reviews, {
-      where: { author: userId, reviewId: reviewId },
+  async checkReviewOwner(userId: string, reviewId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    const isOwner = await queryRunner.manager.exists(Reviews, {
+      where: { author: userId, reviewId },
     });
+    await queryRunner.release();
 
     return isOwner;
   }
 
-  async deleteReview(reviewId: string, dbManager: EntityManager) {
-    await dbManager.delete(Reviews, reviewId);
+  async deleteReview(reviewId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      await queryRunner.manager.delete(Reviews, reviewId);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException('DB ERROR: ' + error.message);
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

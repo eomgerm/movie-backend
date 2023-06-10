@@ -12,8 +12,6 @@ import {
 import { CreateUserDto } from './dto/createUserDto';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { TransactionManger } from 'src/transaction.interceptor';
-import { EntityManager } from 'typeorm';
 
 @Controller('users')
 export class UsersController {
@@ -32,25 +30,17 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Delete('/reviews/:reviewId')
-  async deleteReview(
-    @Request() req,
-    @Param('reviewId') reviewId: string,
-    @TransactionManger() dbManager: EntityManager,
-  ) {
+  async deleteReview(@Request() req, @Param('reviewId') reviewId: string) {
     const {
       user: { sub: userId },
     } = req;
 
-    const isOwner = await this.usersService.checkReviewOwner(
-      userId,
-      reviewId,
-      dbManager,
-    );
+    const isOwner = await this.usersService.checkReviewOwner(userId, reviewId);
 
     if (!isOwner) {
       throw new ForbiddenException('You are not owner of this review');
     }
 
-    return await this.usersService.deleteReview(reviewId, dbManager);
+    return await this.usersService.deleteReview(reviewId);
   }
 }
