@@ -5,7 +5,8 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { Users } from 'src/entities/Users';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
+import { Reviews } from 'src/entities/Reviews';
 
 @Injectable()
 export class UsersService {
@@ -37,5 +38,21 @@ export class UsersService {
     const queryRunner = this.dataSource.createQueryRunner();
 
     return await queryRunner.manager.findOneBy(Users, { email: email });
+  }
+
+  async checkReviewOwner(
+    userId: string,
+    reviewId: string,
+    dbManager: EntityManager,
+  ) {
+    const isOwner = await dbManager.exists(Reviews, {
+      where: { author: userId, reviewId: reviewId },
+    });
+
+    return isOwner;
+  }
+
+  async deleteReview(reviewId: string, dbManager: EntityManager) {
+    await dbManager.delete(Reviews, reviewId);
   }
 }
