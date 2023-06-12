@@ -11,11 +11,13 @@ import {
 import { AuthService } from './auth.service';
 import { signInDto } from './dto/signInDto';
 import { AuthGuard } from './auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiTags('authentication')
   @Post('login')
   @HttpCode(HttpStatus.OK)
   postSignIn(@Body() signInDto: signInDto) {

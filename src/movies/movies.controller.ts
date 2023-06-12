@@ -16,6 +16,7 @@ import { MoviesService } from './movies.service';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateReviewDto } from 'src/reviews/createReviewDto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('movies')
 export class MoviesController {
@@ -23,6 +24,7 @@ export class MoviesController {
     private readonly movieService: MoviesService,
     private readonly reviewsService: ReviewsService,
   ) {}
+  @ApiTags('movies')
   @Post()
   createMovies(
     @Body(new ParseArrayPipe({ items: CreateMovieDto }))
@@ -35,22 +37,25 @@ export class MoviesController {
     return this.movieService.createMovie(movieData);
   }
 
+  @ApiTags('movies')
   @Get('/:movieId')
   getMovieById(@Param('movieId') movieId: string) {
     return this.movieService.findOneById(movieId);
   }
 
+  @ApiTags('movies')
   @Get()
   getAllMovies() {
     return this.movieService.findAll();
   }
 
+  @ApiTags('reviews')
   @Get('/:movieId/reviews')
   async getAllReviws(@Param('movieId') movieId: string) {
-    console.log(movieId);
     return await this.reviewsService.findAllReviews(movieId);
   }
 
+  @ApiTags('reviews')
   @UseGuards(AuthGuard)
   @Post('/:movieId/reviews')
   async createReview(

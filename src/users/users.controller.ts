@@ -15,6 +15,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { CreateHelpfulReviewDto } from './dto/createHelpfulReviewDto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
@@ -23,17 +24,20 @@ export class UsersController {
     private readonly reviewsService: ReviewsService,
   ) {}
 
+  @ApiTags('users')
   @Post()
   postUser(@Body() userData: CreateUserDto) {
     return this.usersService.createUser(userData);
   }
 
+  @ApiTags('users')
   @UseGuards(AuthGuard)
   @Get('/profile')
   getProfile(@Request() req) {
     return req.user;
   }
 
+  @ApiTags('reviews')
   @UseGuards(AuthGuard)
   @Delete('/reviews/:reviewId')
   async deleteReview(@Request() req, @Param('reviewId') reviewId: string) {
@@ -59,6 +63,7 @@ export class UsersController {
     return await this.reviewsService.deleteReview(reviewId);
   }
 
+  @ApiTags('reviews')
   @UseGuards(AuthGuard)
   @Post('/helpful_reviews')
   async postHelpfulReview(

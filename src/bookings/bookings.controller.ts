@@ -12,11 +12,13 @@ import {
 import { BookingsService } from './bookings.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { BookingDto } from './dto/bookingDto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('bookings')
 export class BookingsController {
   constructor(private readonly bookingService: BookingsService) {}
 
+  @ApiTags('bookings')
   @UseGuards(AuthGuard)
   @Post(':scheduleId')
   async postBooking(
@@ -44,6 +46,7 @@ export class BookingsController {
     );
   }
 
+  @ApiTags('bookings')
   @UseGuards(AuthGuard)
   @Delete(':scheduleId/:bookingId')
   async deleteBooking(@Param('bookingId') bookingId: string, @Request() req) {
