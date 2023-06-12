@@ -41,7 +41,7 @@ export class UsersService {
     return await queryRunner.manager.findOneBy(Users, { email: email });
   }
 
-  async createHelpfulReview(userId: string, reviewId: string) {
+  async createReviewHelpful(userId: string, reviewId: string) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
@@ -58,6 +58,45 @@ export class UsersService {
       return identifiers[0].id;
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async deleteReviewHelpful(userId: string, reviewId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      await queryRunner.manager.delete(ReviewHelpful, {
+        userId,
+        reviewId,
+      });
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async findReviewHelpful(reviewId: string, userId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+
+      const helpful = await queryRunner.manager.findOne(ReviewHelpful, {
+        where: { reviewId, userId },
+      });
+
+      return helpful;
+    } catch (error) {
       throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
     } finally {
       await queryRunner.release();

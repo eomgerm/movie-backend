@@ -9,12 +9,13 @@ import {
   Delete,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { ReviewsService } from 'src/reviews/reviews.service';
-import { CreateHelpfulReviewDto } from './dto/createHelpfulReviewDto';
+import { CreateReviewHelpfulDto } from './dto/createReviewHelpful';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
@@ -45,7 +46,7 @@ export class UsersController {
       user: { sub: userId },
     } = req;
 
-    const isExists = await this.reviewsService.checkReview(reviewId);
+    const isExists = await this.reviewsService.findReviewById(reviewId);
 
     if (!isExists) {
       throw new NotFoundException('Review not found');
@@ -63,12 +64,12 @@ export class UsersController {
     return await this.reviewsService.deleteReview(reviewId);
   }
 
-  @ApiTags('reviews')
+  @ApiTags('review-helpful')
   @UseGuards(AuthGuard)
-  @Post('/helpful_reviews')
+  @Post('/review_helpful')
   async postHelpfulReview(
     @Request() req,
-    @Body() helpfulReview: CreateHelpfulReviewDto,
+    @Body() helpfulReview: CreateReviewHelpfulDto,
   ) {
     const {
       user: { sub: userId },
@@ -76,12 +77,50 @@ export class UsersController {
 
     const { reviewId } = helpfulReview;
 
-    const isExists = await this.reviewsService.checkReview(reviewId);
+    const review = await this.reviewsService.findReviewById(reviewId);
 
-    if (!isExists) {
+    if (!review) {
       throw new NotFoundException('Review not found');
     }
 
-    return await this.usersService.createHelpfulReview(userId, reviewId);
+    const isReviewHelpful = await this.usersService.findReviewHelpful(
+      reviewId,
+      userId,
+    );
+
+    if (isReviewHelpful) {
+      throw new BadRequestException('You already helpfuled this review');
+    }
+
+    return await this.usersService.createReviewHelpful(userId, reviewId);
+  }
+
+  @ApiTags('review-helpful')
+  @UseGuards(AuthGuard)
+  @Delete('/review_helpful/:review_id')
+  async deleteHelpfulReview(
+    @Request() req,
+    @Param('review_id') reviewId: string,
+  ) {
+    const {
+      user: { sub: userId },
+    } = req;
+
+    const review = await this.reviewsService.findReviewById(reviewId);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    const isReviewHelpful = await this.usersService.findReviewHelpful(
+      reviewId,
+      userId,
+    );
+
+    if (!isReviewHelpful) {
+      throw new BadRequestException("You didn't helpfuled this review");
+    }
+
+    return await this.usersService.deleteReviewHelpful(userId, reviewId);
   }
 }
