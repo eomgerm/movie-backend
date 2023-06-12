@@ -1,3 +1,4 @@
+import { ApiExtraModels, ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -10,6 +11,10 @@ import {
 } from 'class-validator';
 
 export class ActorDto {
+  @ApiProperty({
+    example: '홍길동',
+    description: 'actor name',
+  })
   @IsString()
   readonly name: string;
 
@@ -24,6 +29,9 @@ export class DirectorDto {
 }
 
 export class CreateMovieDto {
+  @ApiProperty({
+    description: 'bla',
+  })
   @IsString()
   readonly title: string;
 
@@ -42,11 +50,17 @@ export class CreateMovieDto {
   @IsInt()
   readonly runningTime: number;
 
+  @ApiProperty({
+    type: ActorDto,
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ActorDto)
   readonly actors: ActorDto[];
 
+  @ApiProperty({
+    type: DirectorDto,
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DirectorDto)
