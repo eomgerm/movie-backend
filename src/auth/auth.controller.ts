@@ -9,8 +9,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { signInDto } from './dto/signInDto';
-import { AuthGuard } from './auth.guard';
+import { SignInDto } from './dto/signInDto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
@@ -20,7 +19,7 @@ export class AuthController {
   @ApiTags('authentication')
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  postSignIn(@Body() signInDto: signInDto) {
+  postSignIn(@Body() signInDto: SignInDto) {
     const { email, password } = signInDto;
     return this.authService.signIn(email, password);
   }
