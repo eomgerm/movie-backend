@@ -3,7 +3,7 @@ import { Bookings } from 'src/entities/Bookings';
 import { Reviews } from 'src/entities/Reviews';
 import { ScreenSchedule } from 'src/entities/ScreenSchedule';
 import { DataSource, In } from 'typeorm';
-import { CreateReviewDto } from './createReviewDto';
+import { CreateReviewDto } from './dto/createReviewDto';
 
 @Injectable()
 export class ReviewsService {
@@ -82,16 +82,16 @@ export class ReviewsService {
     }
   }
 
-  async checkReview(reviewId: string) {
+  async findReviewById(reviewId: string) {
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
       await queryRunner.connect();
-      const isExists = await queryRunner.manager.exists(Reviews, {
+      const review = await queryRunner.manager.findOne(Reviews, {
         where: { reviewId },
       });
 
-      return isExists;
+      return review;
     } catch (error) {
       throw new InternalServerErrorException('DB ERROR: ' + error.message);
     } finally {

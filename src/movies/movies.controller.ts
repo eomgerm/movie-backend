@@ -15,7 +15,7 @@ import { CreateMovieDto } from './dto/createMovieDto';
 import { MoviesService } from './movies.service';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { CreateReviewDto } from 'src/reviews/createReviewDto';
+import { CreateReviewDto } from 'src/reviews/dto/createReviewDto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('movies')
