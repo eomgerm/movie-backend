@@ -1,6 +1,6 @@
 import { IsNumber } from 'class-validator';
 
-export class CreateHelpfulReviewDto {
+export class CreateReviewHelpfulDto {
   @IsNumber()
   reviewId: string;
 }
