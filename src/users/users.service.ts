@@ -5,8 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
 import { Users } from 'src/entities/Users';
-import { DataSource, RelationId } from 'typeorm';
-import { Reviews } from 'src/entities/Reviews';
+import { DataSource } from 'typeorm';
 import { ReviewHelpful } from 'src/entities/ReviewHelpful';
 
 @Injectable()
@@ -14,15 +13,30 @@ export class UsersService {
   constructor(private dataSource: DataSource) {}
   async createUser(userData: CreateUserDto) {
     const queryRunner = this.dataSource.createQueryRunner();
-
     try {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      const isUserExists = await this.findbyEmail(userData.email);
+      const {
+        email,
+        password,
+        name,
+        username,
+        mobile,
+        birthDate,
+        gender,
+        profileUrl,
+      } = userData;
+
+      const isUserExists = await this.findbyEmail(email);
       if (isUserExists) {
         throw new ForbiddenException('Email already exists');
       }
+      const insertUserQuery = `
+      insert into users(email, password, name, username, mobile, birth_date, gender, profile_url) 
+      values(${email}, ${password}, ${name}, ${username}, ${mobile}, ${birthDate}, ${gender}, ${profileUrl})}
+      `;
+
       const insertResult = await queryRunner.manager.insert(Users, userData);
 
       await queryRunner.commitTransaction();
@@ -37,8 +51,18 @@ export class UsersService {
 
   async findbyEmail(email: string) {
     const queryRunner = this.dataSource.createQueryRunner();
+    try {
+      await queryRunner.connect();
 
-    return await queryRunner.manager.findOneBy(Users, { email: email });
+      const selectUserQuery = `select * from users where email = ${email}`;
+      const [queryResult] = await queryRunner.manager.query(selectUserQuery);
+
+      return queryResult;
+    } catch (error) {
+      throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async createReviewHelpful(userId: string, reviewId: string) {
