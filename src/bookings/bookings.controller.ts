@@ -30,6 +30,8 @@ export class BookingsController {
       user: { sub: userId },
     } = req;
 
+    console.log(req.user);
+
     const isOccupied = await this.bookingService.validateSeats(
       scheduleId,
       bookingData.seats,

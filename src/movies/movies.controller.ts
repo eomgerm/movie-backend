@@ -70,6 +70,7 @@ export class MoviesController {
       movieId,
       userId,
     );
+    console.log(checkBookings);
 
     if (!checkBookings) {
       throw new ForbiddenException(

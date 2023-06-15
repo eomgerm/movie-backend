@@ -27,7 +27,12 @@ export class UsersController {
 
   @ApiTags('users')
   @Post()
-  postUser(@Body() userData: CreateUserDto) {
+  async postUser(@Body() userData: CreateUserDto) {
+    const isUserExists = await this.usersService.findbyEmail(userData.email);
+    if (isUserExists) {
+      throw new ForbiddenException('Email already exists');
+    }
+
     return this.usersService.createUser(userData);
   }
 

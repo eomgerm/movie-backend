@@ -1,12 +1,8 @@
-import {
-  ForbiddenException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto';
-import { Users } from 'src/entities/Users';
 import { DataSource } from 'typeorm';
 import { ReviewHelpful } from 'src/entities/ReviewHelpful';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -28,19 +24,17 @@ export class UsersService {
         profileUrl,
       } = userData;
 
-      const isUserExists = await this.findbyEmail(email);
-      if (isUserExists) {
-        throw new ForbiddenException('Email already exists');
-      }
+      const encryptedPassword = await bcrypt.hash(password, 10);
+
       const insertUserQuery = `
-      insert into users(email, password, name, username, mobile, birth_date, gender, profile_url) 
-      values(${email}, ${password}, ${name}, ${username}, ${mobile}, ${birthDate}, ${gender}, ${profileUrl})}
+      insert into users(email, password, name, username, mobile, birth_date, gender, profile_image) 
+      values('${email}', '${encryptedPassword}', '${name}', '${username}', '${mobile}', '${birthDate}', '${gender}', '${profileUrl}')
       `;
 
-      const insertResult = await queryRunner.manager.insert(Users, userData);
+      const insertResult = await queryRunner.manager.query(insertUserQuery);
 
       await queryRunner.commitTransaction();
-      return insertResult;
+      return insertResult.insertId;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw new InternalServerErrorException(`DB ERROR - ${error.message}`);
@@ -54,7 +48,7 @@ export class UsersService {
     try {
       await queryRunner.connect();
 
-      const selectUserQuery = `select * from users where email = ${email}`;
+      const selectUserQuery = `select * from users where email = '${email}'`;
       const [queryResult] = await queryRunner.manager.query(selectUserQuery);
 
       return queryResult;
